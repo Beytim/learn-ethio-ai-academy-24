@@ -1,7 +1,7 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Bot, BookOpen, TrendingUp, Award, Users, Clock } from "lucide-react";
-import heroImage from "@/assets/hero-education.jpg";
 
 export function FeaturesSection() {
   const features = [
@@ -98,7 +98,7 @@ export function FeaturesSection() {
               <div className="absolute inset-0 bg-gradient-primary rounded-3xl blur-xl opacity-20 transform rotate-6"></div>
               <Card className="relative overflow-hidden shadow-strong border-2 border-border">
                 <img 
-                  src={heroImage} 
+                  src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80" 
                   alt="Students learning with Beytim Academy"
                   className="w-full h-auto rounded-lg"
                 />
