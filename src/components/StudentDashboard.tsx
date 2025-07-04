@@ -1,11 +1,16 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { BookOpen, Award, Clock, Target, TrendingUp, Play, Bot } from "lucide-react";
+import { BookOpen, Award, Clock, Play, Bot } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { QuickActions } from "./dashboard/QuickActions";
+import { StudyReminders } from "./dashboard/StudyReminders";
+import { PerformanceChart } from "./dashboard/PerformanceChart";
+import { LearningStreak } from "./dashboard/LearningStreak";
 
 interface StudentDashboardProps {
   onStartLesson: (subject: string, grade: number) => void;
@@ -39,12 +44,6 @@ export function StudentDashboard({ onStartLesson, onOpenAITutor }: StudentDashbo
     { title: "Perfect Score", description: "Get 100% on any quiz", icon: "⭐", earned: false },
     { title: "Speed Learner", description: "Complete 10 lessons in a week", icon: "⚡", earned: false },
     { title: "Helper", description: "Help 5 classmates", icon: "🤝", earned: false }
-  ];
-
-  const upcomingLessons = [
-    { subject: "Mathematics", lesson: "Functions and Graphs", difficulty: "Medium", duration: "45 min" },
-    { subject: "Physics", lesson: "Energy and Work", difficulty: "Hard", duration: "50 min" },
-    { subject: "Chemistry", lesson: "Chemical Bonding", difficulty: "Easy", duration: "35 min" }
   ];
 
   return (
@@ -95,9 +94,19 @@ export function StudentDashboard({ onStartLesson, onOpenAITutor }: StudentDashbo
         </CardContent>
       </Card>
 
-      <div className="grid lg:grid-cols-3 gap-8">
+      <div className="grid lg:grid-cols-4 gap-6">
+        {/* Left Sidebar - Quick Actions & Streak */}
+        <div className="lg:col-span-1 space-y-6">
+          <QuickActions 
+            onStartLesson={onStartLesson} 
+            onOpenAITutor={onOpenAITutor}
+            userGrade={user?.grade || 7}
+          />
+          <LearningStreak />
+        </div>
+
         {/* Main Content */}
-        <div className="lg:col-span-2 space-y-8">
+        <div className="lg:col-span-2 space-y-6">
           {/* Subject Progress */}
           <Card className="shadow-medium">
             <CardHeader>
@@ -179,38 +188,11 @@ export function StudentDashboard({ onStartLesson, onOpenAITutor }: StudentDashbo
           </Card>
         </div>
 
-        {/* Sidebar */}
-        <div className="space-y-8">
-          {/* Upcoming Lessons */}
-          <Card className="shadow-medium">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Target className="h-5 w-5" />
-                <span>Next Lessons</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {upcomingLessons.map((lesson, index) => (
-                <div key={index} className="space-y-2 p-3 bg-muted rounded-lg">
-                  <div className="font-medium text-sm">{lesson.lesson}</div>
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span>{lesson.subject}</span>
-                    <Badge 
-                      variant="outline" 
-                      className={`text-xs ${
-                        lesson.difficulty === 'Easy' ? 'border-success' :
-                        lesson.difficulty === 'Medium' ? 'border-warning' : 'border-destructive'
-                      }`}
-                    >
-                      {lesson.difficulty}
-                    </Badge>
-                  </div>
-                  <div className="text-xs text-muted-foreground">{lesson.duration}</div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-
+        {/* Right Sidebar */}
+        <div className="lg:col-span-1 space-y-6">
+          <PerformanceChart />
+          <StudyReminders />
+          
           {/* Achievements */}
           <Card className="shadow-medium">
             <CardHeader>
@@ -235,26 +217,6 @@ export function StudentDashboard({ onStartLesson, onOpenAITutor }: StudentDashbo
                     <div className="text-xs opacity-75">{achievement.description}</div>
                   </div>
                 ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Weekly Goal */}
-          <Card className="shadow-medium">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <TrendingUp className="h-5 w-5" />
-                <span>Weekly Goal</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold">6/10</div>
-                <div className="text-sm text-muted-foreground">Lessons this week</div>
-              </div>
-              <Progress value={60} className="h-2" />
-              <div className="text-xs text-center text-muted-foreground">
-                4 more lessons to reach your goal!
               </div>
             </CardContent>
           </Card>
