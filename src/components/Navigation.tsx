@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { BookOpen, User, LogOut, Home, Search, Info, MessageCircle } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 interface NavigationProps {
   user?: {
@@ -26,6 +26,7 @@ interface NavigationProps {
 
 export function Navigation({ user, onLogin, onLogout }: NavigationProps) {
   const location = useLocation();
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const getRoleBadgeVariant = (role: string) => {
@@ -38,6 +39,10 @@ export function Navigation({ user, onLogin, onLogout }: NavigationProps) {
   };
 
   const isActive = (path: string) => location.pathname === path;
+
+  const handleGetStarted = () => {
+    navigate('/auth');
+  };
 
   return (
     <nav className="bg-card/95 backdrop-blur-sm border-b border-border sticky top-0 z-50 shadow-soft">
@@ -168,7 +173,7 @@ export function Navigation({ user, onLogin, onLogout }: NavigationProps) {
               </DropdownMenu>
             ) : (
               <Button 
-                onClick={onLogin} 
+                onClick={handleGetStarted} 
                 className="bg-gradient-primary hover:shadow-medium transition-all duration-300 shadow-soft"
               >
                 Get Started

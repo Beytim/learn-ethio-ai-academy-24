@@ -1,8 +1,9 @@
+
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { HeroSection } from "@/components/HeroSection";
 import { FeaturesSection } from "@/components/FeaturesSection";
-import { AuthModal } from "@/components/AuthModal";
 import { StudentDashboard } from "@/components/StudentDashboard";
 import { LessonPage } from "@/components/LessonPage";
 import { AITutorChat } from "@/components/AITutorChat";
@@ -10,7 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
   const { user, logout } = useAuth();
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const navigate = useNavigate();
   const [currentView, setCurrentView] = useState<'home' | 'dashboard' | 'lesson'>('home');
   const [isAITutorOpen, setIsAITutorOpen] = useState(false);
   const [lessonDetails, setLessonDetails] = useState({ subject: 'Mathematics', grade: 7, chapter: 'Chapter 1: Sets' });
@@ -19,7 +20,7 @@ const Index = () => {
     if (user) {
       setCurrentView('dashboard');
     } else {
-      setIsAuthModalOpen(true);
+      navigate('/auth');
     }
   };
 
@@ -74,7 +75,7 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Navigation
         user={user}
-        onLogin={() => setIsAuthModalOpen(true)}
+        onLogin={() => navigate('/auth')}
         onLogout={() => {
           logout();
           setCurrentView('home');
@@ -82,11 +83,6 @@ const Index = () => {
       />
       
       {renderCurrentView()}
-
-      <AuthModal
-        isOpen={isAuthModalOpen}
-        onClose={() => setIsAuthModalOpen(false)}
-      />
 
       <AITutorChat
         isOpen={isAITutorOpen}
