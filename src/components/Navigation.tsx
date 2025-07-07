@@ -17,7 +17,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 interface NavigationProps {
   user?: {
     name: string;
-    role: 'student' | 'teacher' | 'admin';
+    role: 'student' | 'teacher' | 'parent' | 'admin';
     avatar?: string;
   };
   onLogin: () => void;
@@ -33,6 +33,7 @@ export function Navigation({ user, onLogin, onLogout }: NavigationProps) {
     switch (role) {
       case 'admin': return 'destructive';
       case 'teacher': return 'secondary';
+      case 'parent': return 'outline';
       case 'student': return 'default';
       default: return 'outline';
     }
