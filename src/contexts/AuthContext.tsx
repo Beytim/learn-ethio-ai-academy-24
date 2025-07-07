@@ -1,10 +1,11 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 interface User {
   id: string;
   name: string;
   email: string;
-  role: 'student' | 'teacher' | 'admin';
+  role: 'student' | 'teacher' | 'parent' | 'admin';
   grade?: number;
   avatar?: string;
   progress?: {
@@ -16,7 +17,7 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string, role: 'student' | 'teacher' | 'admin') => Promise<void>;
+  login: (email: string, password: string, role: 'student' | 'teacher' | 'parent' | 'admin') => Promise<void>;
   logout: () => void;
   isLoading: boolean;
 }
@@ -45,6 +46,12 @@ const MOCK_USERS: User[] = [
   },
   {
     id: '3',
+    name: 'Michael Brown',
+    email: 'parent@demo.com',
+    role: 'parent'
+  },
+  {
+    id: '4',
     name: 'Admin User',
     email: 'admin@demo.com',
     role: 'admin'
@@ -64,7 +71,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(false);
   }, []);
 
-  const login = async (email: string, password: string, role: 'student' | 'teacher' | 'admin') => {
+  const login = async (email: string, password: string, role: 'student' | 'teacher' | 'parent' | 'admin') => {
     setIsLoading(true);
     
     // Simulate API call

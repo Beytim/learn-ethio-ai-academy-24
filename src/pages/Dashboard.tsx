@@ -15,6 +15,16 @@ const Dashboard = () => {
   // Mock user role - in a real app, this would come from the user data
   const userRole = user?.role || 'student';
 
+  const handleStartLesson = (subject: string, grade: number) => {
+    console.log(`Starting lesson: ${subject} for grade ${grade}`);
+    // Navigate to lesson or open lesson modal
+  };
+
+  const handleOpenAITutor = () => {
+    console.log("Opening AI Tutor");
+    // Open AI tutor chat interface
+  };
+
   const renderDashboard = () => {
     switch (userRole) {
       case 'teacher':
@@ -24,7 +34,12 @@ const Dashboard = () => {
       case 'admin':
         return <AdminDashboard />;
       default:
-        return <StudentDashboard />;
+        return (
+          <StudentDashboard 
+            onStartLesson={handleStartLesson}
+            onOpenAITutor={handleOpenAITutor}
+          />
+        );
     }
   };
 
