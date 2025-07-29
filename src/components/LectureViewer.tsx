@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
+import { SmartAITutor } from "@/components/enhanced/SmartAITutor";
+import { InteractiveAssessment } from "@/components/enhanced/InteractiveAssessment";
 import { 
   Play, 
   Pause,
@@ -18,7 +20,9 @@ import {
   Brain,
   Download,
   Volume2,
-  RotateCcw
+  RotateCcw,
+  Zap,
+  Award
 } from "lucide-react";
 
 interface Lecture {
@@ -42,6 +46,9 @@ export function LectureViewer({ lecture, onBack, onComplete, onOpenAITutor }: Le
   const [progress, setProgress] = useState(lecture.completed ? 100 : 0);
   const [notes, setNotes] = useState("");
   const [showNotes, setShowNotes] = useState(false);
+  const [showSmartTutor, setShowSmartTutor] = useState(false);
+  const [showAssessment, setShowAssessment] = useState(false);
+  const [assessmentResult, setAssessmentResult] = useState<any>(null);
 
   const getLectureIcon = (type: string) => {
     switch (type) {
@@ -240,9 +247,13 @@ export function LectureViewer({ lecture, onBack, onComplete, onOpenAITutor }: Le
             </div>
             
             <div className="flex items-center space-x-2">
-              <Button variant="outline" onClick={onOpenAITutor}>
+              <Button variant="outline" onClick={() => setShowSmartTutor(true)}>
                 <Brain className="h-4 w-4 mr-2" />
-                AI Tutor
+                Smart AI Tutor
+              </Button>
+              <Button variant="outline" onClick={() => setShowAssessment(true)}>
+                <Award className="h-4 w-4 mr-2" />
+                Take Assessment
               </Button>
               <Button 
                 variant="outline" 
@@ -349,9 +360,13 @@ export function LectureViewer({ lecture, onBack, onComplete, onOpenAITutor }: Le
                 <CardTitle className="text-lg">Quick Actions</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button variant="outline" className="w-full justify-start" onClick={onOpenAITutor}>
+                <Button variant="outline" className="w-full justify-start" onClick={() => setShowSmartTutor(true)}>
                   <Brain className="h-4 w-4 mr-2" />
-                  Ask AI Tutor
+                  Smart AI Tutor
+                </Button>
+                <Button variant="outline" className="w-full justify-start" onClick={() => setShowAssessment(true)}>
+                  <Zap className="h-4 w-4 mr-2" />
+                  Interactive Assessment
                 </Button>
                 <Button variant="outline" className="w-full justify-start">
                   <Download className="h-4 w-4 mr-2" />
@@ -406,6 +421,34 @@ export function LectureViewer({ lecture, onBack, onComplete, onOpenAITutor }: Le
           </div>
         </div>
       </div>
+
+      {/* Enhanced AI Tutor Modal */}
+      {showSmartTutor && (
+        <SmartAITutor
+          isOpen={showSmartTutor}
+          onClose={() => setShowSmartTutor(false)}
+          subject="Mathematics"
+          topic="Set Theory"
+          grade={9}
+          studentId="student_001"
+        />
+      )}
+
+      {/* Interactive Assessment Modal */}
+      {showAssessment && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <InteractiveAssessment
+            subject="Mathematics"
+            topic="Set Theory"
+            grade={9}
+            onComplete={(result) => {
+              setAssessmentResult(result);
+              setShowAssessment(false);
+            }}
+            onClose={() => setShowAssessment(false)}
+          />
+        </div>
+      )}
     </div>
   );
 }
