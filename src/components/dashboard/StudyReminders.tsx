@@ -1,87 +1,99 @@
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { Bell, Clock, Calendar, BookOpen, AlertCircle, CheckCircle2, Plus } from 'lucide-react';
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Clock, Bell, CheckCircle, AlertCircle } from "lucide-react";
+interface Reminder {
+  id: string;
+  title: string;
+  description: string;
+  time: string;
+  type: 'lesson' | 'quiz' | 'assignment' | 'study-session';
+  priority: 'high' | 'medium' | 'low';
+  enabled: boolean;
+  completed: boolean;
+}
+
+const mockReminders: Reminder[] = [
+  {
+    id: '1',
+    title: 'Mathematics Quiz',
+    description: 'Algebra and Geometry review',
+    time: '2:00 PM Today',
+    type: 'quiz',
+    priority: 'high',
+    enabled: true,
+    completed: false
+  },
+  {
+    id: '2',
+    title: 'Chemistry Lesson',
+    description: 'Chemical Reactions and Equations',
+    time: '4:30 PM Today',
+    type: 'lesson',
+    priority: 'medium',
+    enabled: true,
+    completed: false
+  }
+];
 
 export function StudyReminders() {
-  const reminders = [
-    {
-      title: "Physics Assignment Due",
-      subject: "Physics",
-      time: "Tomorrow 3:00 PM",
-      priority: "high",
-      type: "assignment",
-    },
-    {
-      title: "Math Quiz Review",
-      subject: "Mathematics",
-      time: "Today 6:00 PM",
-      priority: "medium",
-      type: "study",
-    },
-    {
-      title: "Chemistry Lab Report",
-      subject: "Chemistry",
-      time: "Friday 9:00 AM",
-      priority: "low",
-      type: "assignment",
-    },
-    {
-      title: "Biology Chapter Reading",
-      subject: "Biology",
-      time: "This Weekend",
-      priority: "medium",
-      type: "study",
-    },
-  ];
+  const [reminders, setReminders] = useState<Reminder[]>(mockReminders);
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'high': return 'bg-red-500';
-      case 'medium': return 'bg-yellow-500';
-      case 'low': return 'bg-green-500';
-      default: return 'bg-gray-500';
-    }
+  const toggleReminder = (id: string) => {
+    setReminders(prev => prev.map(reminder => 
+      reminder.id === id 
+        ? { ...reminder, enabled: !reminder.enabled }
+        : reminder
+    ));
   };
 
   const getTypeIcon = (type: string) => {
-    return type === 'assignment' ? AlertCircle : Clock;
+    switch (type) {
+      case 'lesson': return <BookOpen className="h-4 w-4" />;
+      case 'quiz': return <AlertCircle className="h-4 w-4" />;
+      case 'assignment': return <Calendar className="h-4 w-4" />;
+      case 'study-session': return <Clock className="h-4 w-4" />;
+      default: return <Bell className="h-4 w-4" />;
+    }
   };
 
   return (
-    <Card className="shadow-medium">
+    <Card>
       <CardHeader>
-        <CardTitle className="flex items-center space-x-2">
+        <CardTitle className="flex items-center gap-2">
           <Bell className="h-5 w-5" />
-          <span>Study Reminders</span>
+          Study Reminders
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3">
-        {reminders.map((reminder, index) => {
-          const TypeIcon = getTypeIcon(reminder.type);
-          return (
-            <div key={index} className="flex items-center justify-between p-3 bg-muted rounded-lg">
-              <div className="flex items-center space-x-3">
-                <div className={`p-1 rounded-full ${getPriorityColor(reminder.priority)}`}>
-                  <TypeIcon className="h-3 w-3 text-white" />
+      <CardContent>
+        <div className="space-y-4">
+          {reminders.map((reminder) => (
+            <div key={reminder.id} className="p-4 border rounded-lg">
+              <div className="flex items-start justify-between">
+                <div className="flex items-start gap-3 flex-1">
+                  <div className="mt-1 text-primary">
+                    {getTypeIcon(reminder.type)}
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-sm">{reminder.title}</h4>
+                    <p className="text-sm text-muted-foreground mb-2">{reminder.description}</p>
+                    <div className="flex items-center gap-2 text-xs">
+                      <Clock className="h-3 w-3" />
+                      <span>{reminder.time}</span>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <div className="font-medium text-sm">{reminder.title}</div>
-                  <div className="text-xs text-muted-foreground">{reminder.subject} • {reminder.time}</div>
-                </div>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Badge variant="outline" className="text-xs">
-                  {reminder.priority}
-                </Badge>
-                <Button size="sm" variant="ghost" className="h-6 w-6 p-0">
-                  <CheckCircle className="h-3 w-3" />
-                </Button>
+                <Switch
+                  checked={reminder.enabled}
+                  onCheckedChange={() => toggleReminder(reminder.id)}
+                />
               </div>
             </div>
-          );
-        })}
+          ))}
+        </div>
       </CardContent>
     </Card>
   );

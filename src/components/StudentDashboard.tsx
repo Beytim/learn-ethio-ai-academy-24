@@ -97,11 +97,7 @@ export function StudentDashboard({ onStartLesson, onOpenAITutor }: StudentDashbo
       <div className="grid lg:grid-cols-4 gap-6">
         {/* Left Sidebar - Quick Actions & Streak */}
         <div className="lg:col-span-1 space-y-6">
-          <QuickActions 
-            onStartLesson={onStartLesson} 
-            onOpenAITutor={onOpenAITutor}
-            userGrade={user?.grade || 7}
-          />
+          <QuickActions />
           <LearningStreak />
         </div>
 
