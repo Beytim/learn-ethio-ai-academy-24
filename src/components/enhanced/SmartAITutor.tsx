@@ -1,590 +1,318 @@
-import { useState, useRef, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Textarea } from "@/components/ui/textarea";
-import { Progress } from "@/components/ui/progress";
-import { Slider } from "@/components/ui/slider";
+import React, { useState, useRef, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
   Bot, 
-  User, 
   Send, 
   Mic, 
-  MicOff, 
   Volume2, 
-  VolumeX,
+  BookOpen, 
+  Lightbulb,
   Brain,
   Target,
-  TrendingUp,
-  BookOpen,
-  CheckCircle,
-  XCircle,
-  Lightbulb,
-  MessageSquare,
-  Settings,
-  BarChart3,
   Zap,
-  Star
-} from "lucide-react";
+  MessageSquare,
+  User
+} from 'lucide-react';
 
 interface Message {
   id: string;
   content: string;
   sender: 'user' | 'ai';
   timestamp: Date;
-  type: 'text' | 'quiz' | 'explanation' | 'assessment' | 'encouragement';
-  confidence?: number;
+  type: 'text' | 'explanation' | 'hint' | 'encouragement';
+  relatedTopic?: string;
   difficulty?: 'easy' | 'medium' | 'hard';
-  topic?: string;
-  isCorrect?: boolean;
-}
-
-interface LearningProfile {
-  strengths: string[];
-  weaknesses: string[];
-  preferredLearningStyle: 'visual' | 'auditory' | 'kinesthetic' | 'reading';
-  currentLevel: number;
-  masteryTopics: string[];
-  strugglingTopics: string[];
-  totalQuestions: number;
-  correctAnswers: number;
 }
 
 interface SmartAITutorProps {
-  isOpen: boolean;
-  onClose: () => void;
-  subject: string;
-  topic: string;
-  grade: number;
-  studentId: string;
+  studentLevel: string;
+  currentSubject: string;
+  currentTopic: string;
+  learningStyle?: 'visual' | 'auditory' | 'kinesthetic' | 'reading';
+  onTopicSuggestion?: (topic: string) => void;
 }
 
 export function SmartAITutor({ 
-  isOpen, 
-  onClose, 
-  subject, 
-  topic, 
-  grade, 
-  studentId 
+  studentLevel, 
+  currentSubject, 
+  currentTopic, 
+  learningStyle = 'visual',
+  onTopicSuggestion 
 }: SmartAITutorProps) {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [inputValue, setInputValue] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  const [isListening, setIsListening] = useState(false);
-  const [speechEnabled, setSpeechEnabled] = useState(true);
-  const [tutorMode, setTutorMode] = useState<'chat' | 'quiz' | 'assessment' | 'practice'>('chat');
-  const [currentQuestion, setCurrentQuestion] = useState<any>(null);
-  const [learningProfile, setLearningProfile] = useState<LearningProfile>({
-    strengths: ['Algebra', 'Geometry'],
-    weaknesses: ['Trigonometry'],
-    preferredLearningStyle: 'visual',
-    currentLevel: 7,
-    masteryTopics: ['Basic Sets', 'Union Operations'],
-    strugglingTopics: ['Complex Functions'],
-    totalQuestions: 25,
-    correctAnswers: 18
-  });
-  const [sessionStats, setSessionStats] = useState({
-    questionsAnswered: 0,
-    correctAnswers: 0,
-    currentStreak: 0,
-    timeSpent: 0
-  });
-
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const speechSynthesis = useRef<SpeechSynthesis | null>(null);
-  const recognition = useRef<any>(null);
-
-  // Enhanced AI responses with adaptive difficulty
-  const getAIResponse = (userInput: string, context: any) => {
-    const input = userInput.toLowerCase();
-    const difficulty = learningProfile.currentLevel >= 8 ? 'hard' : 
-                     learningProfile.currentLevel >= 6 ? 'medium' : 'easy';
-
-    // Contextual responses based on student profile
-    const responses = {
-      greeting: `Hello ${studentId}! I'm your personalized AI tutor for Grade ${grade} ${subject}. Based on your learning profile, I see you're strong in ${learningProfile.strengths.join(', ')} and we'll work together on ${learningProfile.weaknesses.join(', ')}. Ready to learn about ${topic}?`,
-      
-      explanation: {
-        easy: `Let me explain ${topic} in simple terms. Think of it like organizing your books - sets are just collections of things that belong together. For example, all your math books form a "set" of math books.`,
-        medium: `${topic} in mathematics refers to well-defined collections of objects. In Ethiopian Grade ${grade} curriculum, we use set notation like A = {1, 2, 3} to represent these collections. Each element belongs to the set uniquely.`,
-        hard: `In advanced set theory for Grade ${grade}, we explore concepts like power sets, Cartesian products, and set operations. The Ethiopian curriculum emphasizes practical applications in probability and statistics.`
-      },
-
-      quiz: {
-        easy: `Let's practice! If you have a set A = {red, blue, green} and set B = {blue, yellow}, what color appears in both sets? \na) red \nb) blue \nc) green \nd) yellow`,
-        medium: `Here's a challenge: Given A = {x | x is an even number, 2 ≤ x ≤ 10} and B = {x | x is a multiple of 3, 0 < x ≤ 12}, find A ∩ B. \na) {6} \nb) {6, 12} \nc) {2, 4, 6, 8, 10} \nd) {3, 6, 9, 12}`,
-        hard: `Advanced problem: If |A ∪ B| = 25, |A| = 15, and |A ∩ B| = 5, find |B|. Use the principle of inclusion-exclusion. \na) 10 \nb) 15 \nc) 20 \nd) 25`
-      },
-
-      encouragement: [
-        "Excellent work! You're showing great progress in understanding sets. 🌟",
-        "I can see you're thinking critically about this. That's exactly the right approach! 💪",
-        "Your mathematical reasoning is improving with each question. Keep it up! 🚀",
-        "Great job! You're mastering concepts that will help you in advanced mathematics. ✨"
-      ]
-    };
-
-    if (input.includes('hello') || input.includes('hi')) {
-      return { content: responses.greeting, type: 'text' as const };
-    }
-    
-    if (input.includes('explain') || input.includes('what is')) {
-      return { content: responses.explanation[difficulty], type: 'explanation' as const };
-    }
-    
-    if (input.includes('quiz') || input.includes('question') || input.includes('test')) {
-      return { 
-        content: responses.quiz[difficulty], 
-        type: 'quiz' as const,
-        difficulty: difficulty as 'easy' | 'medium' | 'hard'
-      };
-    }
-
-    // Adaptive response based on recent performance
-    const recentAccuracy = sessionStats.questionsAnswered > 0 
-      ? sessionStats.correctAnswers / sessionStats.questionsAnswered 
-      : 0;
-
-    if (recentAccuracy > 0.8) {
-      return {
-        content: "I notice you're doing excellent! Let me give you a more challenging problem to help you grow even more.",
-        type: 'encouragement' as const
-      };
-    } else if (recentAccuracy < 0.5) {
-      return {
-        content: "I see you might need some extra support. Let's break this down into smaller steps and practice the fundamentals.",
-        type: 'explanation' as const
-      };
-    }
-
-    return {
-      content: `That's an interesting question about ${topic}! Let me help you understand this better. Based on your learning profile, I think you'll grasp this concept well with some examples.`,
-      type: 'text' as const
-    };
-  };
-
-  // Initialize speech synthesis
-  useEffect(() => {
-    if ('speechSynthesis' in window) {
-      speechSynthesis.current = window.speechSynthesis;
-    }
-
-    if ('webkitSpeechRecognition' in window) {
-      const SpeechRecognition = (window as any).webkitSpeechRecognition;
-      recognition.current = new SpeechRecognition();
-      recognition.current.continuous = false;
-      recognition.current.interimResults = false;
-      recognition.current.lang = 'en-US';
-
-      recognition.current.onresult = (event: any) => {
-        const transcript = event.results[0][0].transcript;
-        setInputValue(transcript);
-        setIsListening(false);
-      };
-
-      recognition.current.onerror = () => {
-        setIsListening(false);
-      };
-    }
-
-    // Initialize conversation
-    const welcomeMessage: Message = {
-      id: 'welcome',
-      content: getAIResponse('hello', {}).content,
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: '1',
+      content: `Hello! I'm your AI tutor for ${currentSubject}. I'm here to help you master ${currentTopic}. What would you like to learn about today?`,
       sender: 'ai',
       timestamp: new Date(),
-      type: 'text'
-    };
-    setMessages([welcomeMessage]);
-
-    if (speechEnabled) {
-      speakText(welcomeMessage.content);
+      type: 'encouragement'
     }
-  }, []);
+  ]);
+  const [inputMessage, setInputMessage] = useState('');
+  const [isRecording, setIsRecording] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom
-  useEffect(() => {
+  const scrollToBottom = () => {
     if (scrollAreaRef.current) {
       scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
     }
+  };
+
+  useEffect(() => {
+    scrollToBottom();
   }, [messages]);
 
-  const speakText = (text: string) => {
-    if (speechSynthesis.current && speechEnabled) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 0.9;
-      utterance.pitch = 1.1;
-      utterance.voice = speechSynthesis.current.getVoices().find(voice => 
-        voice.name.includes('Female') || voice.name.includes('Samantha')
-      ) || null;
-      speechSynthesis.current.speak(utterance);
+  const generateAIResponse = (userMessage: string): Message => {
+    // Simulate intelligent AI responses based on content
+    const responses = {
+      greeting: [
+        "Great to see you're ready to learn! Let's dive into some exciting concepts.",
+        "I'm excited to help you understand this topic better. What specific area interests you?"
+      ],
+      question: [
+        "That's an excellent question! Let me break this down step by step...",
+        "I love your curiosity! Here's how we can approach this problem..."
+      ],
+      difficulty: [
+        "I notice this might be challenging. Let's start with the basics and build up gradually.",
+        "This is a complex topic, but I believe in you! Let's tackle it together."
+      ],
+      encouragement: [
+        "You're doing great! Keep asking questions - that's how we learn best.",
+        "I can see you're really thinking about this. That's the spirit of a true learner!"
+      ]
+    };
+
+    let responseType: keyof typeof responses = 'encouragement';
+    let response = '';
+
+    if (userMessage.toLowerCase().includes('hello') || userMessage.toLowerCase().includes('hi')) {
+      responseType = 'greeting';
+    } else if (userMessage.includes('?')) {
+      responseType = 'question';
+    } else if (userMessage.toLowerCase().includes('hard') || userMessage.toLowerCase().includes('difficult')) {
+      responseType = 'difficulty';
     }
+
+    response = responses[responseType][Math.floor(Math.random() * responses[responseType].length)];
+
+    // Add context-specific information based on current topic
+    if (currentTopic.toLowerCase().includes('algebra')) {
+      response += " In algebra, we work with variables and equations to solve real-world problems.";
+    } else if (currentTopic.toLowerCase().includes('geometry')) {
+      response += " Geometry helps us understand shapes, spaces, and how they relate to each other.";
+    }
+
+    return {
+      id: Date.now().toString(),
+      content: response,
+      sender: 'ai',
+      timestamp: new Date(),
+      type: responseType === 'question' ? 'explanation' : 'encouragement',
+      relatedTopic: currentTopic
+    };
   };
 
-  const startListening = () => {
-    if (recognition.current) {
-      setIsListening(true);
-      recognition.current.start();
-    }
-  };
-
-  const stopListening = () => {
-    if (recognition.current) {
-      recognition.current.stop();
-      setIsListening(false);
-    }
-  };
-
-  const handleSendMessage = async () => {
-    if (!inputValue.trim()) return;
+  const handleSendMessage = () => {
+    if (!inputMessage.trim()) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
-      content: inputValue,
+      content: inputMessage,
       sender: 'user',
       timestamp: new Date(),
       type: 'text'
     };
 
     setMessages(prev => [...prev, userMessage]);
-    const currentInput = inputValue;
-    setInputValue('');
+    setInputMessage('');
     setIsTyping(true);
 
-    // Simulate processing time
+    // Simulate AI thinking time
     setTimeout(() => {
-      const aiResponse = getAIResponse(currentInput, { 
-        recentMessages: messages.slice(-3),
-        learningProfile,
-        sessionStats 
-      });
-
-      const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        content: aiResponse.content,
-        sender: 'ai',
-        timestamp: new Date(),
-        type: aiResponse.type,
-        difficulty: aiResponse.difficulty,
-        topic: topic
-      };
-
-      setMessages(prev => [...prev, aiMessage]);
+      const aiResponse = generateAIResponse(inputMessage);
+      setMessages(prev => [...prev, aiResponse]);
       setIsTyping(false);
-
-      if (speechEnabled) {
-        speakText(aiResponse.content);
-      }
-
-      // Update session stats
-      if (aiResponse.type === 'quiz') {
-        setSessionStats(prev => ({
-          ...prev,
-          questionsAnswered: prev.questionsAnswered + 1
-        }));
-      }
-    }, 1500);
+    }, 1000 + Math.random() * 2000);
   };
 
-  const assessAnswer = (answer: string, isCorrect: boolean) => {
-    setSessionStats(prev => ({
-      ...prev,
-      correctAnswers: isCorrect ? prev.correctAnswers + 1 : prev.correctAnswers,
-      currentStreak: isCorrect ? prev.currentStreak + 1 : 0
-    }));
-
-    const feedback = isCorrect 
-      ? "🎉 Excellent! That's correct. You're really understanding these concepts well."
-      : "Not quite right, but great effort! Let me explain the correct approach.";
-
-    const feedbackMessage: Message = {
-      id: Date.now().toString(),
-      content: feedback,
-      sender: 'ai',
-      timestamp: new Date(),
-      type: 'assessment',
-      isCorrect
-    };
-
-    setMessages(prev => [...prev, feedbackMessage]);
-    
-    if (speechEnabled) {
-      speakText(feedback);
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSendMessage();
     }
   };
 
-  const quickActions = [
-    { icon: Brain, label: "Explain Concept", action: () => setInputValue("Explain this concept") },
-    { icon: Target, label: "Take Quiz", action: () => setInputValue("Give me a quiz") },
-    { icon: BookOpen, label: "Examples", action: () => setInputValue("Show me examples") },
-    { icon: Lightbulb, label: "Hint", action: () => setInputValue("Give me a hint") }
+  const getMessageIcon = (type: Message['type']) => {
+    switch (type) {
+      case 'explanation':
+        return <BookOpen className="h-4 w-4 text-blue-500" />;
+      case 'hint':
+        return <Lightbulb className="h-4 w-4 text-yellow-500" />;
+      case 'encouragement':
+        return <Zap className="h-4 w-4 text-green-500" />;
+      default:
+        return <MessageSquare className="h-4 w-4" />;
+    }
+  };
+
+  const suggestedQuestions = [
+    `Explain the basics of ${currentTopic}`,
+    `Give me a practice problem`,
+    `What are real-world applications?`,
+    `I'm struggling with this concept`
   ];
 
-  const accuracy = sessionStats.questionsAnswered > 0 
-    ? (sessionStats.correctAnswers / sessionStats.questionsAnswered) * 100 
-    : 0;
-
-  if (!isOpen) return null;
-
   return (
-    <Card className="fixed inset-4 bg-card border border-border shadow-strong z-50 flex flex-col max-w-6xl mx-auto">
-      <CardHeader className="pb-4 border-b border-border bg-gradient-primary text-primary-foreground">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="bg-primary-foreground/20 p-3 rounded-full">
-              <Brain className="h-6 w-6" />
-            </div>
-            <div>
-              <CardTitle className="text-xl">Smart AI Tutor</CardTitle>
-              <div className="flex items-center space-x-3 mt-1">
-                <Badge variant="secondary" className="bg-primary-foreground/20 text-primary-foreground">
-                  Grade {grade} {subject}
-                </Badge>
-                <Badge variant="secondary" className="bg-primary-foreground/20 text-primary-foreground">
-                  {topic}
-                </Badge>
-                <div className="flex items-center space-x-1">
-                  <div className="w-2 h-2 bg-success rounded-full animate-pulse"></div>
-                  <span className="text-sm">Active</span>
-                </div>
-              </div>
-            </div>
+    <Card className="h-[600px] flex flex-col">
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2">
+          <div className="p-2 rounded-lg bg-primary/10">
+            <Brain className="h-5 w-5 text-primary" />
           </div>
-          
-          <div className="flex items-center space-x-2">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => setSpeechEnabled(!speechEnabled)}
-              className="text-primary-foreground hover:bg-primary-foreground/20"
-            >
-              {speechEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={onClose}
-              className="text-primary-foreground hover:bg-primary-foreground/20"
-            >
-              ×
-            </Button>
-          </div>
-        </div>
-
-        {/* Performance Dashboard */}
-        <div className="grid grid-cols-4 gap-4 mt-4">
-          <div className="bg-primary-foreground/10 rounded-lg p-3 text-center">
-            <div className="text-2xl font-bold">{sessionStats.questionsAnswered}</div>
-            <div className="text-sm opacity-90">Questions</div>
-          </div>
-          <div className="bg-primary-foreground/10 rounded-lg p-3 text-center">
-            <div className="text-2xl font-bold">{accuracy.toFixed(0)}%</div>
-            <div className="text-sm opacity-90">Accuracy</div>
-          </div>
-          <div className="bg-primary-foreground/10 rounded-lg p-3 text-center">
-            <div className="text-2xl font-bold">{sessionStats.currentStreak}</div>
-            <div className="text-sm opacity-90">Streak</div>
-          </div>
-          <div className="bg-primary-foreground/10 rounded-lg p-3 text-center">
-            <div className="text-2xl font-bold">Level {learningProfile.currentLevel}</div>
-            <div className="text-sm opacity-90">Progress</div>
-          </div>
+          Smart AI Tutor
+          <Badge variant="secondary" className="ml-auto">
+            {learningStyle} learner
+          </Badge>
+        </CardTitle>
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Target className="h-4 w-4" />
+          <span>{currentSubject} • {currentTopic} • Grade {studentLevel}</span>
         </div>
       </CardHeader>
 
-      <CardContent className="flex-1 flex p-0">
-        {/* Main Chat Area */}
-        <div className="flex-1 flex flex-col">
-          <ScrollArea className="flex-1 p-6" ref={scrollAreaRef}>
-            <div className="space-y-4">
-              {messages.map((message) => (
+      <CardContent className="flex-1 flex flex-col gap-4 p-4">
+        {/* Chat Messages */}
+        <ScrollArea ref={scrollAreaRef} className="flex-1 pr-4">
+          <div className="space-y-4">
+            {messages.map((message) => (
+              <div
+                key={message.id}
+                className={`flex items-start gap-3 ${
+                  message.sender === 'user' ? 'justify-end' : 'justify-start'
+                }`}
+              >
+                {message.sender === 'ai' && (
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback className="bg-primary/10">
+                      <Bot className="h-4 w-4 text-primary" />
+                    </AvatarFallback>
+                  </Avatar>
+                )}
+
                 <div
-                  key={message.id}
-                  className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                  className={`max-w-[80%] rounded-lg p-3 ${
+                    message.sender === 'user'
+                      ? 'bg-primary text-primary-foreground ml-auto'
+                      : 'bg-muted'
+                  }`}
                 >
-                  <div className={`flex items-start space-x-3 max-w-[80%]`}>
-                    {message.sender === 'ai' && (
-                      <div className="bg-gradient-primary p-2 rounded-full">
-                        <Bot className="h-4 w-4 text-primary-foreground" />
-                      </div>
-                    )}
-                    
-                    <div
-                      className={`rounded-lg p-4 ${
-                        message.sender === 'user'
-                          ? 'bg-primary text-primary-foreground'
-                          : message.type === 'quiz'
-                          ? 'bg-warning/10 border-2 border-warning/20'
-                          : message.type === 'assessment'
-                          ? message.isCorrect 
-                            ? 'bg-success/10 border-2 border-success/20'
-                            : 'bg-destructive/10 border-2 border-destructive/20'
-                          : 'bg-muted'
-                      }`}
-                    >
-                      {message.type === 'quiz' && (
-                        <div className="flex items-center space-x-2 mb-3">
-                          <Target className="h-4 w-4" />
-                          <span className="font-semibold">Practice Question</span>
-                          {message.difficulty && (
-                            <Badge variant="outline" className="text-xs">
-                              {message.difficulty}
-                            </Badge>
-                          )}
-                        </div>
-                      )}
-
-                      {message.type === 'assessment' && (
-                        <div className="flex items-center space-x-2 mb-3">
-                          {message.isCorrect ? (
-                            <CheckCircle className="h-4 w-4 text-success" />
-                          ) : (
-                            <XCircle className="h-4 w-4 text-destructive" />
-                          )}
-                          <span className="font-semibold">
-                            {message.isCorrect ? 'Correct!' : 'Incorrect'}
-                          </span>
-                        </div>
-                      )}
-
-                      <div className="whitespace-pre-wrap">{message.content}</div>
-                    </div>
-
-                    {message.sender === 'user' && (
-                      <div className="bg-primary p-2 rounded-full">
-                        <User className="h-4 w-4 text-primary-foreground" />
-                      </div>
-                    )}
+                  <div className="flex items-center gap-2 mb-1">
+                    {message.sender === 'ai' && getMessageIcon(message.type)}
+                    <span className="text-xs opacity-70">
+                      {message.timestamp.toLocaleTimeString([], { 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                      })}
+                    </span>
                   </div>
+                  <p className="text-sm">{message.content}</p>
+                  {message.relatedTopic && (
+                    <Badge variant="outline" className="mt-2 text-xs">
+                      {message.relatedTopic}
+                    </Badge>
+                  )}
                 </div>
-              ))}
 
-              {isTyping && (
-                <div className="flex justify-start">
-                  <div className="flex items-center space-x-3">
-                    <div className="bg-gradient-primary p-2 rounded-full">
-                      <Bot className="h-4 w-4 text-primary-foreground" />
-                    </div>
-                    <div className="bg-muted rounded-lg p-4">
-                      <div className="flex space-x-1">
-                        <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"></div>
-                        <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                        <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </ScrollArea>
-
-          {/* Quick Actions */}
-          <div className="p-4 border-t border-border">
-            <div className="flex flex-wrap gap-2 mb-4">
-              {quickActions.map((action, index) => (
-                <Button
-                  key={index}
-                  variant="outline"
-                  size="sm"
-                  className="flex items-center space-x-2"
-                  onClick={action.action}
-                >
-                  <action.icon className="h-3 w-3" />
-                  <span>{action.label}</span>
-                </Button>
-              ))}
-            </div>
-
-            {/* Input Area */}
-            <div className="flex space-x-3">
-              <div className="flex-1 flex space-x-2">
-                <Input
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  placeholder="Ask me anything about mathematics..."
-                  className="flex-1"
-                  onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                />
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={isListening ? stopListening : startListening}
-                  className={isListening ? 'bg-destructive text-destructive-foreground' : ''}
-                >
-                  {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-                </Button>
+                {message.sender === 'user' && (
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback>
+                      <User className="h-4 w-4" />
+                    </AvatarFallback>
+                  </Avatar>
+                )}
               </div>
-              <Button onClick={handleSendMessage} disabled={!inputValue.trim()}>
-                <Send className="h-4 w-4" />
+            ))}
+
+            {isTyping && (
+              <div className="flex items-start gap-3">
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback className="bg-primary/10">
+                    <Bot className="h-4 w-4 text-primary" />
+                  </AvatarFallback>
+                </Avatar>
+                <div className="bg-muted rounded-lg p-3">
+                  <div className="flex items-center gap-1">
+                    <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <div className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </ScrollArea>
+
+        {/* Suggested Questions */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          {suggestedQuestions.map((question, index) => (
+            <Button
+              key={index}
+              variant="ghost"
+              size="sm"
+              className="justify-start text-xs h-auto p-2 text-left"
+              onClick={() => setInputMessage(question)}
+            >
+              <Lightbulb className="h-3 w-3 mr-2 flex-shrink-0" />
+              <span className="truncate">{question}</span>
+            </Button>
+          ))}
+        </div>
+
+        {/* Input Area */}
+        <div className="flex items-center gap-2">
+          <div className="flex-1 relative">
+            <Input
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Ask me anything about your studies..."
+              className="pr-20"
+            />
+            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0"
+                onClick={() => setIsRecording(!isRecording)}
+              >
+                <Mic className={`h-4 w-4 ${isRecording ? 'text-red-500' : ''}`} />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0"
+              >
+                <Volume2 className="h-4 w-4" />
               </Button>
             </div>
           </div>
+          <Button 
+            onClick={handleSendMessage}
+            disabled={!inputMessage.trim()}
+            size="sm"
+          >
+            <Send className="h-4 w-4" />
+          </Button>
         </div>
 
-        {/* Sidebar - Learning Analytics */}
-        <div className="w-80 border-l border-border bg-muted/30 p-6 space-y-6">
-          <div>
-            <h3 className="font-semibold mb-3 flex items-center">
-              <BarChart3 className="h-4 w-4 mr-2" />
-              Learning Analytics
-            </h3>
-            <div className="space-y-3">
-              <div>
-                <div className="flex justify-between text-sm mb-1">
-                  <span>Overall Progress</span>
-                  <span>{accuracy.toFixed(0)}%</span>
-                </div>
-                <Progress value={accuracy} className="h-2" />
-              </div>
-              <div>
-                <div className="flex justify-between text-sm mb-1">
-                  <span>Current Level</span>
-                  <span>Level {learningProfile.currentLevel}</span>
-                </div>
-                <Progress value={(learningProfile.currentLevel / 10) * 100} className="h-2" />
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <h3 className="font-semibold mb-3 flex items-center">
-              <Star className="h-4 w-4 mr-2" />
-              Strengths
-            </h3>
-            <div className="space-y-2">
-              {learningProfile.strengths.map((strength, index) => (
-                <Badge key={index} variant="secondary" className="w-full justify-start">
-                  {strength}
-                </Badge>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <h3 className="font-semibold mb-3 flex items-center">
-              <TrendingUp className="h-4 w-4 mr-2" />
-              Focus Areas
-            </h3>
-            <div className="space-y-2">
-              {learningProfile.weaknesses.map((weakness, index) => (
-                <Badge key={index} variant="outline" className="w-full justify-start">
-                  {weakness}
-                </Badge>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <h3 className="font-semibold mb-3">Learning Preferences</h3>
-            <div className="text-sm text-muted-foreground">
-              <p>Style: {learningProfile.preferredLearningStyle}</p>
-              <p>Mastered: {learningProfile.masteryTopics.length} topics</p>
-              <p>Working on: {learningProfile.strugglingTopics.length} topics</p>
-            </div>
-          </div>
+        <div className="text-xs text-muted-foreground text-center">
+          AI responses are generated for educational purposes. Always verify important information.
         </div>
       </CardContent>
     </Card>

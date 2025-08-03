@@ -425,12 +425,10 @@ export function LectureViewer({ lecture, onBack, onComplete, onOpenAITutor }: Le
       {/* Enhanced AI Tutor Modal */}
       {showSmartTutor && (
         <SmartAITutor
-          isOpen={showSmartTutor}
-          onClose={() => setShowSmartTutor(false)}
-          subject="Mathematics"
-          topic="Set Theory"
-          grade={9}
-          studentId="student_001"
+          studentLevel="9"
+          currentSubject="Mathematics"
+          currentTopic="Set Theory"
+          learningStyle="visual"
         />
       )}
 
@@ -438,11 +436,31 @@ export function LectureViewer({ lecture, onBack, onComplete, onOpenAITutor }: Le
       {showAssessment && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <InteractiveAssessment
+            title="Set Theory Assessment"
             subject="Mathematics"
             topic="Set Theory"
-            grade={9}
-            onComplete={(result) => {
-              setAssessmentResult(result);
+            questions={[
+              {
+                id: 'q1',
+                question: 'Which symbol represents the union of two sets?',
+                type: 'multiple-choice',
+                options: ['∩', '∪', '⊆', '∈'],
+                correctAnswer: '∪',
+                points: 10,
+                difficulty: 'easy'
+              },
+              {
+                id: 'q2',
+                question: 'Drag the correct symbol for intersection',
+                type: 'drag-drop',
+                options: ['∩', '∪', '⊆', '∈'],
+                correctAnswer: '∩',
+                points: 15,
+                difficulty: 'medium'
+              }
+            ]}
+            onComplete={(score, total) => {
+              setAssessmentResult({ score, total });
               setShowAssessment(false);
             }}
             onClose={() => setShowAssessment(false)}
