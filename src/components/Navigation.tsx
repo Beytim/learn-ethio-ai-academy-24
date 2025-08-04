@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { 
   BookOpen, User, LogOut, Home, Search, Info, MessageCircle, Menu, 
   BarChart3, Award, Video, Calendar, Users, Download, Settings, 
-  Smartphone, CreditCard, Brain, ClipboardCheck, Target
+  Smartphone, CreditCard, Brain, ClipboardCheck, Target, Trophy
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
@@ -64,7 +64,7 @@ export function Navigation({ user, onLogin, onLogout }: NavigationProps) {
     { path: '/content-management', name: 'Content Management', icon: Settings, description: 'Manage content', requiresAuth: true },
     { path: '/mobile-app', name: 'Mobile App', icon: Smartphone, description: 'Mobile application' },
     { path: '/pricing', name: 'Pricing', icon: CreditCard, description: 'Subscription plans' },
-    { path: '/about', name: 'About', icon: Info, description: 'About Beytim Academy' },
+    { path: '/gamification', name: 'Gamification', icon: Trophy, description: 'Achievements & quizzes' },
     { path: '/contact', name: 'Contact', icon: MessageCircle, description: 'Get in touch' },
     { path: '/auth', name: 'Authentication', icon: User, description: 'Login/Register' }
   ];

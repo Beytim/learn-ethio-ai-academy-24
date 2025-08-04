@@ -23,6 +23,7 @@ import Certificates from "./pages/Certificates";
 import ContentManagement from "./pages/ContentManagement";
 import MobileApp from "./pages/MobileApp";
 import Pricing from "./pages/Pricing";
+import Gamification from "./pages/Gamification";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +50,7 @@ const App = () => (
             <Route path="/content-management" element={<ContentManagement />} />
             <Route path="/mobile-app" element={<MobileApp />} />
             <Route path="/pricing" element={<Pricing />} />
+            <Route path="/gamification" element={<Gamification />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="*" element={<NotFound />} />
