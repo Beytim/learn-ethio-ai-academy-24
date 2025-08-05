@@ -47,46 +47,63 @@ export function StudentDashboard({ onStartLesson, onOpenAITutor }: StudentDashbo
   ];
 
   return (
-    <div className="container mx-auto px-4 py-8 space-y-8">
-      {/* Welcome Section */}
-      <Card className="bg-gradient-hero text-primary-foreground shadow-strong">
-        <CardContent className="p-8">
-          <div className="flex items-center justify-between">
-            <div className="space-y-4">
-              <div>
-                <h1 className="text-3xl font-bold">Welcome back, {user?.name}!</h1>
-                <p className="text-primary-foreground/80 text-lg">Ready to continue your learning journey?</p>
+    <div className="container mx-auto px-6 py-12 max-w-7xl space-y-12">
+      {/* Welcome Section - Enhanced spacing and layout */}
+      <Card className="bg-gradient-hero text-primary-foreground shadow-strong overflow-hidden">
+        <CardContent className="p-10">
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
+            <div className="space-y-6 flex-1">
+              <div className="space-y-3">
+                <h1 className="text-4xl lg:text-5xl font-bold leading-tight">
+                  Welcome back, {user?.name}!
+                </h1>
+                <p className="text-primary-foreground/80 text-xl">
+                  Ready to continue your learning journey?
+                </p>
               </div>
               
-              <div className="flex space-x-6 text-sm">
-                <div className="text-center">
-                  <div className="text-2xl font-bold">{user?.progress?.completedLessons || 12}</div>
-                  <div className="text-primary-foreground/70">Lessons Completed</div>
+              <div className="grid grid-cols-3 gap-8 lg:gap-12">
+                <div className="text-center space-y-2">
+                  <div className="text-3xl lg:text-4xl font-bold">
+                    {user?.progress?.completedLessons || 12}
+                  </div>
+                  <div className="text-primary-foreground/70 text-sm lg:text-base">
+                    Lessons Completed
+                  </div>
                 </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold">{user?.progress?.avgScore || 85}%</div>
-                  <div className="text-primary-foreground/70">Average Score</div>
+                <div className="text-center space-y-2">
+                  <div className="text-3xl lg:text-4xl font-bold">
+                    {user?.progress?.avgScore || 85}%
+                  </div>
+                  <div className="text-primary-foreground/70 text-sm lg:text-base">
+                    Average Score
+                  </div>
                 </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold">{user?.progress?.totalQuizzes || 8}</div>
-                  <div className="text-primary-foreground/70">Quizzes Taken</div>
+                <div className="text-center space-y-2">
+                  <div className="text-3xl lg:text-4xl font-bold">
+                    {user?.progress?.totalQuizzes || 8}
+                  </div>
+                  <div className="text-primary-foreground/70 text-sm lg:text-base">
+                    Quizzes Taken
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="text-right space-y-4">
-              <Avatar className="h-20 w-20 border-4 border-primary-foreground/20 ml-auto">
+            <div className="flex flex-col items-center lg:items-end space-y-6">
+              <Avatar className="h-24 w-24 lg:h-28 lg:w-28 border-4 border-primary-foreground/20">
                 <AvatarImage src={user?.avatar} alt={user?.name} />
-                <AvatarFallback className="bg-primary-foreground text-primary text-2xl">
+                <AvatarFallback className="bg-primary-foreground text-primary text-3xl">
                   {user?.name?.charAt(0).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <Button 
                 onClick={onOpenAITutor}
                 variant="secondary" 
-                className="bg-primary-foreground text-primary hover:bg-primary-foreground/90"
+                size="lg"
+                className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 px-8 py-3"
               >
-                <Bot className="h-4 w-4 mr-2" />
+                <Bot className="h-5 w-5 mr-3" />
                 Ask AI Tutor
               </Button>
             </div>
@@ -94,59 +111,62 @@ export function StudentDashboard({ onStartLesson, onOpenAITutor }: StudentDashbo
         </CardContent>
       </Card>
 
-      <div className="grid lg:grid-cols-4 gap-6">
+      <div className="grid xl:grid-cols-12 gap-8">
         {/* Left Sidebar - Quick Actions & Streak */}
-        <div className="lg:col-span-1 space-y-6">
+        <div className="xl:col-span-3 space-y-8">
           <QuickActions />
           <LearningStreak />
         </div>
 
-        {/* Main Content */}
-        <div className="lg:col-span-2 space-y-6">
+        {/* Main Content - Enhanced spacing */}
+        <div className="xl:col-span-6 space-y-8">
           {/* Subject Progress */}
           <Card className="shadow-medium">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <BookOpen className="h-5 w-5" />
+            <CardHeader className="pb-6">
+              <CardTitle className="flex items-center space-x-3 text-xl">
+                <BookOpen className="h-6 w-6" />
                 <span>Subject Progress</span>
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="grid md:grid-cols-2 gap-4">
+            <CardContent className="px-6 pb-6">
+              <div className="grid lg:grid-cols-2 gap-6">
                 {subjects.map((subject, index) => (
                   <Card 
                     key={index} 
-                    className={`p-4 cursor-pointer transition-all duration-300 hover:shadow-medium ${
-                      selectedSubject === subject.name ? 'ring-2 ring-primary shadow-medium' : ''
+                    className={`p-6 cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] ${
+                      selectedSubject === subject.name ? 'ring-2 ring-primary shadow-lg scale-[1.02]' : ''
                     }`}
                     onClick={() => setSelectedSubject(subject.name)}
                   >
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                          <span className="text-2xl">{subject.icon}</span>
+                        <div className="flex items-center space-x-4">
+                          <span className="text-3xl">{subject.icon}</span>
                           <div>
-                            <h3 className="font-semibold">{subject.name}</h3>
-                            <p className="text-xs text-muted-foreground">
+                            <h3 className="font-semibold text-lg">{subject.name}</h3>
+                            <p className="text-sm text-muted-foreground">
                               {subject.completedLessons}/{subject.totalLessons} lessons
                             </p>
                           </div>
                         </div>
-                        <Badge variant={subject.progress >= 70 ? "default" : "secondary"}>
+                        <Badge 
+                          variant={subject.progress >= 70 ? "default" : "secondary"}
+                          className="text-sm px-3 py-1"
+                        >
                           {subject.progress}%
                         </Badge>
                       </div>
-                      <Progress value={subject.progress} className="h-2" />
+                      <Progress value={subject.progress} className="h-3" />
                       <Button 
-                        size="sm" 
-                        className="w-full"
+                        size="default"
+                        className="w-full h-10"
                         onClick={(e) => {
                           e.stopPropagation();
                           onStartLesson(subject.name, user?.grade || 7);
                         }}
                       >
-                        <Play className="h-3 w-3 mr-2" />
-                        Continue
+                        <Play className="h-4 w-4 mr-2" />
+                        Continue Learning
                       </Button>
                     </div>
                   </Card>
@@ -157,25 +177,28 @@ export function StudentDashboard({ onStartLesson, onOpenAITutor }: StudentDashbo
 
           {/* Recent Activity */}
           <Card className="shadow-medium">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Clock className="h-5 w-5" />
+            <CardHeader className="pb-6">
+              <CardTitle className="flex items-center space-x-3 text-xl">
+                <Clock className="h-6 w-6" />
                 <span>Recent Activity</span>
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-6 pb-6">
               <div className="space-y-4">
                 {recentActivities.map((activity, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                    <div className="space-y-1">
-                      <div className="font-medium">{activity.lesson}</div>
+                  <div key={index} className="flex items-center justify-between p-4 bg-muted/50 rounded-xl hover:bg-muted transition-colors">
+                    <div className="space-y-2">
+                      <div className="font-medium text-lg">{activity.lesson}</div>
                       <div className="text-sm text-muted-foreground">{activity.subject}</div>
                     </div>
-                    <div className="text-right space-y-1">
-                      <Badge variant={activity.score >= 80 ? "default" : "secondary"}>
+                    <div className="text-right space-y-2">
+                      <Badge 
+                        variant={activity.score >= 80 ? "default" : "secondary"}
+                        className="text-sm px-3 py-1"
+                      >
                         {activity.score}%
                       </Badge>
-                      <div className="text-xs text-muted-foreground">{activity.time}</div>
+                      <div className="text-sm text-muted-foreground">{activity.time}</div>
                     </div>
                   </div>
                 ))}
@@ -184,33 +207,37 @@ export function StudentDashboard({ onStartLesson, onOpenAITutor }: StudentDashbo
           </Card>
         </div>
 
-        {/* Right Sidebar */}
-        <div className="lg:col-span-1 space-y-6">
+        {/* Right Sidebar - Performance & Achievements */}
+        <div className="xl:col-span-3 space-y-8">
           <PerformanceChart />
           <StudyReminders />
           
           {/* Achievements */}
           <Card className="shadow-medium">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Award className="h-5 w-5" />
+            <CardHeader className="pb-6">
+              <CardTitle className="flex items-center space-x-3 text-xl">
+                <Award className="h-6 w-6" />
                 <span>Achievements</span>
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-3">
+            <CardContent className="px-6 pb-6">
+              <div className="grid grid-cols-1 gap-4">
                 {achievements.map((achievement, index) => (
                   <div 
                     key={index} 
-                    className={`p-3 rounded-lg text-center space-y-1 ${
+                    className={`p-4 rounded-xl transition-all duration-300 ${
                       achievement.earned 
-                        ? 'bg-gradient-primary text-primary-foreground shadow-soft' 
-                        : 'bg-muted/50 text-muted-foreground'
+                        ? 'bg-gradient-primary text-primary-foreground shadow-soft hover:shadow-medium' 
+                        : 'bg-muted/50 text-muted-foreground hover:bg-muted'
                     }`}
                   >
-                    <div className="text-2xl">{achievement.icon}</div>
-                    <div className="text-xs font-medium">{achievement.title}</div>
-                    <div className="text-xs opacity-75">{achievement.description}</div>
+                    <div className="flex items-center space-x-4">
+                      <div className="text-3xl">{achievement.icon}</div>
+                      <div className="flex-1">
+                        <div className="font-semibold text-base">{achievement.title}</div>
+                        <div className="text-sm opacity-75">{achievement.description}</div>
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>

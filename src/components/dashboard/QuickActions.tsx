@@ -125,34 +125,34 @@ export function QuickActions() {
   };
 
   return (
-    <div className="grid gap-6">
+    <div className="grid gap-8">
       {/* Quick Actions */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="h-5 w-5" />
+        <CardHeader className="pb-6">
+          <CardTitle className="flex items-center gap-3 text-xl">
+            <TrendingUp className="h-6 w-6" />
             Quick Actions
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CardContent className="px-6 pb-6">
+          <div className="grid grid-cols-1 gap-4">
             {quickActions.map((action) => (
               <Button
                 key={action.id}
                 variant={action.variant}
                 onClick={action.action}
-                className="h-auto p-4 justify-start flex-col items-start space-y-2 relative"
+                className="h-auto p-5 justify-start flex-col items-start space-y-3 relative hover:scale-[1.02] transition-all duration-300"
               >
                 {action.badge && (
-                  <Badge variant="secondary" className="absolute top-2 right-2 text-xs">
+                  <Badge variant="secondary" className="absolute top-3 right-3 text-xs">
                     {action.badge}
                   </Badge>
                 )}
-                <div className="flex items-center gap-2 w-full">
+                <div className="flex items-center gap-3 w-full">
                   {action.icon}
-                  <span className="font-semibold">{action.title}</span>
+                  <span className="font-semibold text-base">{action.title}</span>
                 </div>
-                <p className="text-sm text-muted-foreground text-left">
+                <p className="text-sm text-muted-foreground text-left leading-relaxed">
                   {action.description}
                 </p>
               </Button>
@@ -163,27 +163,27 @@ export function QuickActions() {
 
       {/* Recent Activity */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Clock className="h-5 w-5" />
+        <CardHeader className="pb-6">
+          <CardTitle className="flex items-center gap-3 text-xl">
+            <Clock className="h-6 w-6" />
             Recent Activity
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-6 pb-6">
           <div className="space-y-4">
             {mockRecentActivities.map((activity) => (
               <div
                 key={activity.id}
-                className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
+                className="flex items-center justify-between p-4 border rounded-xl hover:bg-muted/50 hover:shadow-sm transition-all duration-300 cursor-pointer"
                 onClick={() => navigate('/lessons')}
               >
-                <div className="flex items-center gap-3">
-                  <div className={`${getActivityColor(activity.type)}`}>
+                <div className="flex items-center gap-4">
+                  <div className={`${getActivityColor(activity.type)} p-2 rounded-lg bg-muted/50`}>
                     {getActivityIcon(activity.type)}
                   </div>
                   <div>
-                    <h4 className="font-semibold text-sm">{activity.title}</h4>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <h4 className="font-semibold text-base">{activity.title}</h4>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <span>{activity.subject}</span>
                       <span>•</span>
                       <span>{activity.timeAgo}</span>
@@ -191,9 +191,9 @@ export function QuickActions() {
                   </div>
                 </div>
                 <div className="text-right min-w-0 flex-shrink-0">
-                  <p className="text-sm font-medium">{activity.progress}%</p>
-                  <div className="w-20 mt-1">
-                    <Progress value={activity.progress} className="h-1" />
+                  <p className="text-base font-medium">{activity.progress}%</p>
+                  <div className="w-24 mt-2">
+                    <Progress value={activity.progress} className="h-2" />
                   </div>
                 </div>
               </div>
@@ -204,44 +204,44 @@ export function QuickActions() {
 
       {/* Study Goals */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Target className="h-5 w-5" />
+        <CardHeader className="pb-6">
+          <CardTitle className="flex items-center gap-3 text-xl">
+            <Target className="h-6 w-6" />
             Today's Goals
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <BookOpen className="h-4 w-4 text-blue-600" />
-                <span className="text-sm">Complete 2 lessons</span>
+        <CardContent className="px-6 pb-6">
+          <div className="space-y-6">
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <BookOpen className="h-5 w-5 text-blue-600" />
+                <span className="text-base font-medium">Complete 2 lessons</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Progress value={50} className="w-16 h-2" />
-                <span className="text-xs text-muted-foreground">1/2</span>
-              </div>
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <PenTool className="h-4 w-4 text-green-600" />
-                <span className="text-sm">Take 1 practice test</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Progress value={0} className="w-16 h-2" />
-                <span className="text-xs text-muted-foreground">0/1</span>
+              <div className="flex items-center gap-3">
+                <Progress value={50} className="flex-1 h-3" />
+                <span className="text-sm text-muted-foreground font-medium">1/2</span>
               </div>
             </div>
             
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-orange-600" />
-                <span className="text-sm">Study for 1 hour</span>
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <PenTool className="h-5 w-5 text-green-600" />
+                <span className="text-base font-medium">Take 1 practice test</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Progress value={75} className="w-16 h-2" />
-                <span className="text-xs text-muted-foreground">45min</span>
+              <div className="flex items-center gap-3">
+                <Progress value={0} className="flex-1 h-3" />
+                <span className="text-sm text-muted-foreground font-medium">0/1</span>
+              </div>
+            </div>
+            
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <Clock className="h-5 w-5 text-orange-600" />
+                <span className="text-base font-medium">Study for 1 hour</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <Progress value={75} className="flex-1 h-3" />
+                <span className="text-sm text-muted-foreground font-medium">45min</span>
               </div>
             </div>
           </div>
@@ -250,30 +250,30 @@ export function QuickActions() {
 
       {/* Study Groups */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5" />
+        <CardHeader className="pb-6">
+          <CardTitle className="flex items-center gap-3 text-xl">
+            <Users className="h-6 w-6" />
             Study Groups
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 border rounded-lg">
-              <div>
-                <h4 className="font-semibold text-sm">Grade 9 Mathematics</h4>
-                <p className="text-xs text-muted-foreground">12 members • Next session in 2h</p>
+        <CardContent className="px-6 pb-6">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-4 border rounded-xl hover:bg-muted/50 transition-colors">
+              <div className="space-y-1">
+                <h4 className="font-semibold text-base">Grade 9 Mathematics</h4>
+                <p className="text-sm text-muted-foreground">12 members • Next session in 2h</p>
               </div>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="default">
                 Join
               </Button>
             </div>
             
-            <div className="flex items-center justify-between p-3 border rounded-lg">
-              <div>
-                <h4 className="font-semibold text-sm">Chemistry Study Circle</h4>
-                <p className="text-xs text-muted-foreground">8 members • Active now</p>
+            <div className="flex items-center justify-between p-4 border rounded-xl hover:bg-muted/50 transition-colors">
+              <div className="space-y-1">
+                <h4 className="font-semibold text-base">Chemistry Study Circle</h4>
+                <p className="text-sm text-muted-foreground">8 members • Active now</p>
               </div>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="default">
                 Join
               </Button>
             </div>
