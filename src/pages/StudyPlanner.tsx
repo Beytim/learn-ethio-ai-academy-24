@@ -183,7 +183,17 @@ const StudyPlanner = () => {
 
         {/* Content based on active view */}
         {activeView === 'planner' && (
-          <SmartStudyPlanner currentUser={user || { id: '1', name: 'Student', grade: 9 }} />
+          <SmartStudyPlanner currentUser={user ? { 
+            id: user.id, 
+            name: user.name, 
+            grade: user.grade || 9, 
+            subjects: ['Mathematics', 'Physics', 'Chemistry', 'Biology', 'English', 'History']
+          } : { 
+            id: '1', 
+            name: 'Student', 
+            grade: 9, 
+            subjects: ['Mathematics', 'Physics', 'Chemistry', 'Biology', 'English', 'History']
+          }} />
         )}
 
         {activeView === 'schedule' && (

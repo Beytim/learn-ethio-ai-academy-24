@@ -31,8 +31,9 @@ interface InteractiveAssessmentProps {
   subject: string;
   topic: string;
   questions: Question[];
+  timeLimit?: number;
   onComplete: (score: number, totalPoints: number) => void;
-  onClose: () => void;
+  onClose?: () => void;
 }
 
 export function InteractiveAssessment({ 
