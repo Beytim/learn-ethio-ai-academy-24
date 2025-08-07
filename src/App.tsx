@@ -18,6 +18,7 @@ import VideoLessons from "./pages/VideoLessons";
 import StudyPlanner from "./pages/StudyPlanner";
 import SocialLearning from "./pages/SocialLearning";
 import OfflineMode from "./pages/OfflineMode";
+import MasteryLearning from "./pages/MasteryLearning";
 import Analytics from "./pages/Analytics";
 import Certificates from "./pages/Certificates";
 import ContentManagement from "./pages/ContentManagement";
@@ -44,7 +45,8 @@ const App = () => (
             <Route path="/video-lessons" element={<VideoLessons />} />
             <Route path="/study-planner" element={<StudyPlanner />} />
             <Route path="/social-learning" element={<SocialLearning />} />
-            <Route path="/offline-mode" element={<OfflineMode />} />
+          <Route path="/offline-mode" element={<OfflineMode />} />
+          <Route path="/mastery" element={<MasteryLearning />} />
             <Route path="/analytics" element={<Analytics />} />
             <Route path="/certificates" element={<Certificates />} />
             <Route path="/content-management" element={<ContentManagement />} />

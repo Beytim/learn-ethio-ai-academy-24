@@ -53,6 +53,7 @@ export function Navigation({ user, onLogin, onLogout }: NavigationProps) {
     { path: '/', name: 'Home', icon: Home, description: 'Landing page' },
     { path: '/dashboard', name: 'Dashboard', icon: BarChart3, description: 'Student dashboard', requiresAuth: true },
     { path: '/lessons', name: 'Lessons', icon: BookOpen, description: 'Interactive lessons' },
+    { path: '/mastery', name: 'Mastery Learning', icon: Brain, description: 'Khan Academy-style skill mastery' },
     { path: '/practice', name: 'Practice', icon: Target, description: 'Practice exercises' },
     { path: '/practice-tests', name: 'Practice Tests', icon: ClipboardCheck, description: 'Assessment tests' },
     { path: '/video-lessons', name: 'Video Lessons', icon: Video, description: 'Video content' },
